@@ -1,5 +1,5 @@
 import pygame as pg
-import math 
+import random  
 
 pg.init()
 
@@ -9,6 +9,7 @@ cubeLength = 25
 
 white = (255, 255, 255)
 black = (0, 0, 0)
+foodColor = (0, 255, 204)
 
 surface = pg.display.set_mode((length, length))
 pg.display.set_caption("Snake Game")
@@ -68,6 +69,9 @@ class Snake:
     def __init__(self):
         self.listCubes = [Cube(length / 2, length / 2, "right")]
 
+    def getList(self):
+        return self.listCubes
+    
     # todo test if this works
     # adds a cube to the end of the snake, to the left if its going right, down if its going up, etc.
     def addCube(self):
@@ -135,23 +139,43 @@ class Snake:
             self.listCubes[0].setY(self.listCubes[0].getY() + length)
             self.draw()
 
-    # def move(self, direction):
-    #     self.moveBody()
-    #     self.moveHead(direction)
+
+class Food():
+    def __init__(self, Snake):
+        self.x = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength 
+        self.y = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+        self.length = cubeLength
+            
+    def newFood(self):
+        self.x = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+        self.y = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+    
+    def ifEaten(self, Snake):
+        if (
+            Snake.getList()[0].getX() == self.x and 
+            Snake.getList()[0].getY() == self.y 
+            ): 
+            Snake.addCube()
+            self.newFood()
+    
+    def draw(self):
+        pg.draw.rect(surface, foodColor, ((self.x, self.y), (self.length, self.length)))
 
 
-class Food(Cube):
-    def __init__(self, x, y, direction):
-        super().__init__(x, y, direction)
-        
+def checkCollisions(Snake):
+    for cube in Snake.getList():
+        if (
+            cube.getX() == Snake.getList()[0].getX() and # checks if head shares same x coordinate
+            cube.getY() == Snake.getList()[0].getY() and # chekcs if head shares same y coordinate
+            Snake.getList().index(cube) != 1 and  # prevents unintended "collision" of first body piece hitting head
+            Snake.getList().index(cube) != 0 # prevents checking if the head position equals the head position
+            ):
+                collision()
 
-def newFood():
-    x = math.randomInt(0, length - cubeLength)
-    y = math.randomInt(0, length - cubeLength)
-    food = Food()
-    food.draw()
-
-# TODO make a function that draws the food randomly, check if head collides, addCube() if it does
+def collision():
+    pg.quit()
+    quit()
+    # could make this go to a loss screen 
 
 
 def main():
@@ -162,13 +186,14 @@ def main():
     snake = Snake()
     snake.addCube()
     snake.addCube()
-    snake.addCube()
-    snake.addCube()
-    snake.addCube()
+
 
     snake.draw()
 
     direction = "right"
+    
+    food = Food(snake)
+    
     while loop:
         pg.time.delay(80)
         # clock.tick(10)
@@ -180,22 +205,31 @@ def main():
                 if event.key == pg.K_d or event.key == pg.K_RIGHT:
                     if direction != "left":
                         direction = "right"
+                        break # prevents bug of rapidly turning up and right resulting in turning into yourself
                 elif event.key == pg.K_w or event.key == pg.K_UP:
                     if direction != "down":
                         direction = "up"
+                        break # prevents bug of rapidly turning up and right resulting in turning into yourself
                 elif event.key == pg.K_s or event.key == pg.K_DOWN:
                     if direction != "up":
                         direction = "down"
+                        break # prevents bug of rapidly turning up and right resulting in turning into yourself
                 elif event.key == pg.K_a or event.key == pg.K_LEFT:
                     if direction != "right":
                         direction = "left"
+                        break # prevents bug of rapidly turning up and right resulting in turning into yourself
+
 
         eraseScreen()
+        food.ifEaten(snake)
+        food.draw()
         # move body first to get the position of head (for the body piece behind head) before head is moved
         snake.moveBody() 
         snake.moveHead(direction)
-        pg.display.update()
 
+
+        pg.display.update()
+        checkCollisions(snake)
 
 if __name__ == "__main__":
     main()
@@ -203,4 +237,7 @@ if __name__ == "__main__":
 pg.quit()
 quit()
 
-# TODO collision detection 
+# TODO fix bugs, work on interface / colors, make it so when the body of the snake hits food it gets eaten so food doesn't spawn within the snake (or make it so it can't spawn within the snake)
+# ! BUG: when eating food and going to edge of screen snake dies
+    # after the snake eats food if its body is going to the end of the screen it dies 
+    
