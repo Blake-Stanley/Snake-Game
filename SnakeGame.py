@@ -112,7 +112,7 @@ class Snake:
 
     # moves head up, down, left, or right 1 square
     def moveHead(self, direction):
-        # make sure it doesn't move out of screen, but if it does moves to other side of screen
+        # makes sure it doesn't move out of screen, but if it does moves to other side of screen
         if (# x boundary  
             self.listCubes[0].getX() >= 0
             and self.listCubes[0].getX() <= length - cubeLength
@@ -124,31 +124,43 @@ class Snake:
             self.draw()
             
         # x correction 
-        elif self.listCubes[0].getX() >= length - cubeLength:
+        elif self.listCubes[0].getX() >= length:
             self.listCubes[0].setX(self.listCubes[0].getX() - length)
             self.draw()
-        elif self.listCubes[0].getX() <= 0:
+        elif self.listCubes[0].getX() < 0:
             self.listCubes[0].setX(self.listCubes[0].getX() + length)
             self.draw()
             
         # y correction 
-        elif self.listCubes[0].getY() >= length - cubeLength:
+        elif self.listCubes[0].getY() >= length:
             self.listCubes[0].setY(self.listCubes[0].getY() - length)
             self.draw()
-        elif self.listCubes[0].getY() <= 0:
+        elif self.listCubes[0].getY() < 0:
             self.listCubes[0].setY(self.listCubes[0].getY() + length)
             self.draw()
 
 
+
 class Food():
-    def __init__(self, Snake):
-        self.x = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength 
-        self.y = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+    def __init__(self, snake):
+        self.newFood(snake)
         self.length = cubeLength
             
-    def newFood(self):
+    def newFood(self, snake):
+        '''Spawns a new food on a random position on the screen and then 
+        checks if that position is in the snake, and if so it calls itself and creates a new location'''
+        snake = Snake.getList(snake)
         self.x = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
         self.y = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+        
+        
+        for cube in snake:
+            if self.x == cube.getX() and self.y == cube.getY():
+                self.x = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+                self.y = random.randint(0, (length - cubeLength) / cubeLength) * cubeLength
+        
+        if self.x == cube.getX() and self.y == cube.getY():
+            self.newFood(snake)
     
     def ifEaten(self, Snake):
         if (
@@ -156,7 +168,7 @@ class Food():
             Snake.getList()[0].getY() == self.y 
             ): 
             Snake.addCube()
-            self.newFood()
+            self.newFood(Snake)
     
     def draw(self):
         pg.draw.rect(surface, foodColor, ((self.x, self.y), (self.length, self.length)))
@@ -173,6 +185,7 @@ def checkCollisions(Snake):
                 collision()
 
 def collision():
+    print("collision")
     pg.quit()
     quit()
     # could make this go to a loss screen 
@@ -195,7 +208,7 @@ def main():
     food = Food(snake)
     
     while loop:
-        pg.time.delay(80)
+        pg.time.delay(80) 
         # clock.tick(10)
 
         for event in pg.event.get():
