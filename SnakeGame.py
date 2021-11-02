@@ -1,5 +1,7 @@
 import pygame as pg
 import random  
+import Logic.button as button
+import Logic.logic as logic
 
 pg.init()
 
@@ -16,6 +18,7 @@ pg.display.set_caption("Snake Game")
 
 screen = pg.display.set_mode((length, length))
 
+font = pg.font.Font('freesansbold.ttf', 32)
 
 def eraseScreen():
     pg.draw.rect(surface, black, ((0, 0), (length, length)))
@@ -182,16 +185,72 @@ def checkCollisions(Snake):
             Snake.getList().index(cube) != 1 and  # prevents unintended "collision" of first body piece hitting head
             Snake.getList().index(cube) != 0 # prevents checking if the head position equals the head position
             ):
-                collision()
 
-def collision():
+                collision(Snake)
+
+
+def collision(Snake):
+    pg.time.delay(3000)
     print("collision")
-    pg.quit()
-    quit()
-    # could make this go to a loss screen 
+    lossPage(Snake)
 
+def lossPage(Snake):
+    loop = True
+    buttonReplay = button.Button(0, 0, length, length, "")
+    
+    buttonReplay.draw(surface, 200,200,255)
 
-def main():
+    
+    score = len(Snake.getList()) - 3 # -3 because game starts with 3 blocks
+    
+    logic.setHighScore(score)
+    
+    highScore = logic.getHighScore()
+
+    # adding prompt to screen
+    text = font.render("Click to play again", True,
+                       (10, 10, 70))
+    textRect = text.get_rect()
+    textRect.center = (length / 2, length / 2)
+    surface.blit(text, textRect)
+    
+    # adding you lost to screen
+    text0 = font.render("YOU DIED", True,
+                       (200, 10, 10))
+    textRect = text0.get_rect()
+    textRect.center = (length / 2, length / 3)
+    surface.blit(text0, textRect)
+
+    # adding score to screen 
+    text2 = font.render(f"Score: {score}", True,
+                       (10, 10, 70))
+    textRect = text2.get_rect()
+    textRect.center = (length / 5, length/6 * 5)
+    surface.blit(text2, textRect)
+    
+    # adding high score to screen 
+    text3 = font.render(f"High Score: {highScore}", True,
+                       (10, 10, 70))
+    textRect = text3.get_rect()
+    textRect.center = (length / 5 * 4, length/7 * 6)
+    surface.blit(text3, textRect)
+    
+    pg.display.update()
+        
+    while loop:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                loop = False
+                pg.quit()
+                quit()
+        
+            if event.type == pg.MOUSEBUTTONUP:
+                pos = pg.mouse.get_pos()
+                if buttonReplay.isClicked(pos):
+                    loop = False
+    play()
+
+def play():
     loop = True
     # clock = pg.time.Clock()
 
@@ -214,6 +273,8 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 loop = False
+                pg.quit()
+                quit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_d or event.key == pg.K_RIGHT:
                     if direction != "left":
@@ -232,7 +293,8 @@ def main():
                         direction = "left"
                         break # prevents bug of rapidly turning up and right resulting in turning into yourself
 
-
+        # if loop == False:
+        #     pg.quit
         eraseScreen()
         food.ifEaten(snake)
         food.draw()
@@ -243,6 +305,9 @@ def main():
 
         pg.display.update()
         checkCollisions(snake)
+
+def main():
+    play()
 
 if __name__ == "__main__":
     main()
