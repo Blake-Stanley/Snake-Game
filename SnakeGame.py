@@ -209,7 +209,7 @@ def lossPage(Snake):
 
     # adding prompt to screen
     text = font.render("Click to play again", True,
-                       (10, 10, 70))
+                       (10, 10, 50))
     textRect = text.get_rect()
     textRect.center = (length / 2, length / 2)
     surface.blit(text, textRect)
@@ -232,7 +232,7 @@ def lossPage(Snake):
     text3 = font.render(f"High Score: {highScore}", True,
                        (10, 10, 70))
     textRect = text3.get_rect()
-    textRect.center = (length / 5 * 4, length/7 * 6)
+    textRect.center = (length / 4 * 3, length/6 * 5)
     surface.blit(text3, textRect)
     
     pg.display.update()
