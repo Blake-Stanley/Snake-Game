@@ -314,13 +314,3 @@ if __name__ == "__main__":
 
 pg.quit()
 quit()
-
-# TODO fix bugs, work on interface / colors, make it so when the body of the snake hits food it gets eaten so food doesn't spawn within the snake (or make it so it can't spawn within the snake)
-# ! BUG: when eating food and going to edge of screen snake dies
-    # after the snake eats food if its body is going to the end of the screen it dies 
-
-# could have it where every food is a random color and then the snake takes on this random color when it eats it or the cube thats added is the food color 
-# could add smile and eyes to snake head
-# sound when snake is eaten 
-# high score 
-# loss screen 
