@@ -293,8 +293,6 @@ def play():
                         direction = "left"
                         break # prevents bug of rapidly turning up and right resulting in turning into yourself
 
-        # if loop == False:
-        #     pg.quit
         eraseScreen()
         food.ifEaten(snake)
         food.draw()
