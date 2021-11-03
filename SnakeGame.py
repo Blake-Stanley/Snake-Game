@@ -75,7 +75,6 @@ class Snake:
     def getList(self):
         return self.listCubes
     
-    # todo test if this works
     # adds a cube to the end of the snake, to the left if its going right, down if its going up, etc.
     def addCube(self):
         direction = self.listCubes[len(self.listCubes) - 1].getDir()
